@@ -1,0 +1,259 @@
+version: '3.8'
+
+# Strategic Brand Optimization Platform
+# Microservice architecture for tracking, analyzing, and optimizing brand performance
+# across social media platforms compared to competitors
+
+services:
+  # API Gateway - GraphQL interface for all clients
+  graphql:
+    build:
+      context: .
+      dockerfile: graphql/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+      - AUTH_SERVICE_URL=auth:9001
+      - NOTIFICATION_SERVICE_URL=notification:9002
+      - COMPETITOR_SERVICE_URL=competitor:9003
+      - ENGAGEMENT_SERVICE_URL=engagement:9004
+      - CONTENT_SERVICE_URL=content:9005
+      - AUDIENCE_SERVICE_URL=audience:9006
+      - ANALYTICS_SERVICE_URL=analytics:9007
+      - SCRAPER_SERVICE_URL=scraper:9008
+      - ENV=development
+    depends_on:
+      auth:
+        condition: service_healthy
+      notification:
+        condition: service_started
+      competitor:
+        condition: service_started
+      engagement:
+        condition: service_started
+      content:
+        condition: service_started
+      audience:
+        condition: service_started
+      analytics:
+        condition: service_started
+      scraper:
+        condition: service_started
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Authentication & Tenant Management
+  auth:
+    build:
+      context: .
+      dockerfile: auth/Dockerfile
+    ports:
+      - "9001:9001"
+    environment:
+      - PORT=9001
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Competitor Tracking & Analysis
+  competitor:
+    build:
+      context: .
+      dockerfile: competitor/Dockerfile
+    ports:
+      - "9003:9003"
+    environment:
+      - PORT=9003
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Engagement Metrics & Analytics
+  engagement:
+    build:
+      context: .
+      dockerfile: engagement/Dockerfile
+    ports:
+      - "9004:9004"
+    environment:
+      - PORT=9004
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Content Management & Scheduling
+  content:
+    build:
+      context: .
+      dockerfile: content/Dockerfile
+    ports:
+      - "9005:9005"
+    environment:
+      - PORT=9005
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Audience Segmentation & Insights
+  audience:
+    build:
+      context: .
+      dockerfile: audience/Dockerfile
+    ports:
+      - "9006:9006"
+    environment:
+      - PORT=9006
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # AI-Powered Analytics & Recommendations
+  analytics:
+    build:
+      context: .
+      dockerfile: analytics/Dockerfile
+    ports:
+      - "9007:9007"
+    environment:
+      - PORT=9007
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+      competitor:
+        condition: service_started
+      content:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Notifications & Alerts
+  notification:
+    build:
+      context: .
+      dockerfile: notification/Dockerfile
+    ports:
+      - "9002:9002"
+    environment:
+      - PORT=9002
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Social Media Data Collection
+  scraper:
+    build:
+      context: .
+      dockerfile: scraper/Dockerfile
+    ports:
+      - "9008:9008"
+    environment:
+      - PORT=9008
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE=${SUPABASE_SERVICE_ROLE}
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      auth:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  app-network:
+    driver: bridge 

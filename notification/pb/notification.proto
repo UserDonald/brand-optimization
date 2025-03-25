@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package = "github.com/donaldnash/go-competitor/notification/pb";
+
+import "google/protobuf/timestamp.proto";
+
+service NotificationService {
+  // Notification management
+  rpc CreateNotification(CreateNotificationRequest) returns (Notification);
+  rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
+  rpc MarkNotificationAsRead(NotificationStatusRequest) returns (UpdateStatusResponse);
+  rpc ArchiveNotification(NotificationStatusRequest) returns (UpdateStatusResponse);
+  rpc DeleteNotification(NotificationStatusRequest) returns (UpdateStatusResponse);
+
+  // Alert threshold management
+  rpc CreateAlertThreshold(CreateAlertThresholdRequest) returns (AlertThreshold);
+  rpc GetAlertThresholds(GetAlertThresholdsRequest) returns (AlertThresholdsResponse);
+  rpc UpdateAlertThreshold(UpdateAlertThresholdRequest) returns (AlertThreshold);
+  rpc DeleteAlertThreshold(DeleteAlertThresholdRequest) returns (UpdateStatusResponse);
+
+  // Scheduled report management
+  rpc CreateScheduledReport(CreateScheduledReportRequest) returns (ScheduledReport);
+  rpc GetScheduledReports(GetScheduledReportsRequest) returns (ScheduledReportsResponse);
+  rpc UpdateScheduledReport(UpdateScheduledReportRequest) returns (ScheduledReport);
+  rpc DeleteScheduledReport(DeleteScheduledReportRequest) returns (UpdateStatusResponse);
+
+  // Background processes
+  rpc CheckAlertThresholds(CheckAlertThresholdsRequest) returns (NotificationsResponse);
+  rpc ProcessScheduledReports(ProcessScheduledReportsRequest) returns (NotificationsResponse);
+}
+
+// Notification related messages
+message Notification {
+  string id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string type = 4;
+  string title = 5;
+  string message = 6;
+  string priority = 7;
+  string status = 8;
+  string metadata = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+message CreateNotificationRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string type = 3;
+  string title = 4;
+  string message = 5;
+  string priority = 6;
+  string metadata = 7;
+}
+
+message GetNotificationsRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string status = 3;
+}
+
+message NotificationsResponse {
+  repeated Notification notifications = 1;
+}
+
+message NotificationStatusRequest {
+  string tenant_id = 1;
+  string notification_id = 2;
+}
+
+message UpdateStatusResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Alert threshold related messages
+message AlertThreshold {
+  string id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string name = 4;
+  string metric_type = 5;
+  string comparison_type = 6;
+  double value = 7;
+  bool percentage = 8;
+  string period = 9;
+  string status = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+message CreateAlertThresholdRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string name = 3;
+  string metric_type = 4;
+  string comparison_type = 5;
+  double value = 6;
+  bool percentage = 7;
+  string period = 8;
+}
+
+message GetAlertThresholdsRequest {
+  string tenant_id = 1;
+  string metric_type = 2;
+}
+
+message AlertThresholdsResponse {
+  repeated AlertThreshold thresholds = 1;
+}
+
+message UpdateAlertThresholdRequest {
+  string threshold_id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string name = 4;
+  string metric_type = 5;
+  string comparison_type = 6;
+  double value = 7;
+  bool percentage = 8;
+  string period = 9;
+  string status = 10;
+}
+
+message DeleteAlertThresholdRequest {
+  string tenant_id = 1;
+  string threshold_id = 2;
+}
+
+// Scheduled report related messages
+message ScheduledReport {
+  string id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string name = 4;
+  string description = 5;
+  string report_type = 6;
+  string schedule = 7;
+  string filters = 8;
+  string delivery_type = 9;
+  string email_addresses = 10;
+  string status = 11;
+  google.protobuf.Timestamp last_run_at = 12;
+  google.protobuf.Timestamp next_run_at = 13;
+  google.protobuf.Timestamp created_at = 14;
+  google.protobuf.Timestamp updated_at = 15;
+}
+
+message CreateScheduledReportRequest {
+  string tenant_id = 1;
+  string user_id = 2;
+  string name = 3;
+  string description = 4;
+  string report_type = 5;
+  string schedule = 6;
+  string filters = 7;
+  string delivery_type = 8;
+  string email_addresses = 9;
+}
+
+message GetScheduledReportsRequest {
+  string tenant_id = 1;
+}
+
+message ScheduledReportsResponse {
+  repeated ScheduledReport reports = 1;
+}
+
+message UpdateScheduledReportRequest {
+  string report_id = 1;
+  string tenant_id = 2;
+  string user_id = 3;
+  string name = 4;
+  string description = 5;
+  string report_type = 6;
+  string schedule = 7;
+  string filters = 8;
+  string delivery_type = 9;
+  string email_addresses = 10;
+  string status = 11;
+}
+
+message DeleteScheduledReportRequest {
+  string tenant_id = 1;
+  string report_id = 2;
+}
+
+// Background process related messages
+message CheckAlertThresholdsRequest {
+  string tenant_id = 1;
+}
+
+message ProcessScheduledReportsRequest {
+  string tenant_id = 1;
+} 

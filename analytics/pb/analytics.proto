@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+package analytics;
+
+option go_package = "github.com/donaldnash/go-competitor/analytics/pb";
+
+import "google/protobuf/timestamp.proto";
+
+service AnalyticsService {
+  // Predictive analytics endpoints
+  rpc GetPostingTimeRecommendations(PostingTimeRequest) returns (PostingTimeResponse) {}
+  rpc GetContentFormatRecommendations(ContentFormatRequest) returns (ContentFormatResponse) {}
+  
+  // Performance predictions
+  rpc PredictEngagement(PredictEngagementRequest) returns (EngagementPrediction) {}
+  
+  // Content analysis
+  rpc AnalyzeContentPerformance(ContentPerformanceRequest) returns (ContentPerformanceResponse) {}
+  
+  // Recommendation management
+  rpc CreateRecommendation(CreateRecommendationRequest) returns (Recommendation) {}
+  rpc GetRecommendations(GetRecommendationsRequest) returns (RecommendationsResponse) {}
+  rpc UpdateRecommendationStatus(UpdateRecommendationStatusRequest) returns (UpdateRecommendationStatusResponse) {}
+}
+
+// Request and Response messages
+
+// Posting time recommendations
+message PostingTimeRequest {
+  string tenant_id = 1;
+  string day_of_week = 2; // Optional, if empty returns for all days
+}
+
+message PostingTimeResponse {
+  repeated PostingTimeRecommendation recommendations = 1;
+}
+
+message PostingTimeRecommendation {
+  string id = 1;
+  string tenant_id = 2;
+  string day_of_week = 3;
+  int32 hour_of_day = 4;
+  double predicted_engagement_rate = 5;
+  double confidence = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// Content format recommendations
+message ContentFormatRequest {
+  string tenant_id = 1;
+}
+
+message ContentFormatResponse {
+  repeated ContentFormatRecommendation recommendations = 1;
+}
+
+message ContentFormatRecommendation {
+  string id = 1;
+  string tenant_id = 2;
+  string format = 3;
+  string target_audience = 4;
+  double predicted_engagement_rate = 5;
+  double confidence = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// Engagement prediction
+message PredictEngagementRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp post_time = 2;
+  string content_format = 3;
+}
+
+message EngagementPrediction {
+  string id = 1;
+  string tenant_id = 2;
+  google.protobuf.Timestamp post_time = 3;
+  string content_format = 4;
+  int32 predicted_likes = 5;
+  int32 predicted_shares = 6;
+  int32 predicted_comments = 7;
+  double engagement_rate = 8;
+  double confidence = 9;
+  google.protobuf.Timestamp created_at = 10;
+}
+
+// Content performance analysis
+message ContentPerformanceRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message ContentPerformanceResponse {
+  repeated ContentPerformance performances = 1;
+}
+
+message ContentPerformance {
+  string format = 1;
+  int32 total_posts = 2;
+  double avg_engagement_rate = 3;
+  double avg_likes = 4;
+  double avg_shares = 5;
+  double avg_comments = 6;
+  double performance_score = 7;
+  double performance_trend = 8; // positive = improving, negative = declining
+}
+
+// Recommendation management
+message CreateRecommendationRequest {
+  string tenant_id = 1;
+  string type = 2; // "posting_time", "content_format", etc.
+  string title = 3;
+  string description = 4;
+  double expected_improvement = 5;
+}
+
+message GetRecommendationsRequest {
+  string tenant_id = 1;
+  string status = 2; // "pending", "applied", "dismissed", empty for all
+}
+
+message RecommendationsResponse {
+  repeated Recommendation recommendations = 1;
+}
+
+message UpdateRecommendationStatusRequest {
+  string tenant_id = 1;
+  string recommendation_id = 2;
+  string status = 3; // "pending", "applied", "dismissed"
+}
+
+message UpdateRecommendationStatusResponse {
+  bool success = 1;
+}
+
+message Recommendation {
+  string id = 1;
+  string tenant_id = 2;
+  string type = 3; // "posting_time", "content_format", etc.
+  string title = 4;
+  string description = 5;
+  double expected_improvement = 6;
+  string status = 7; // "pending", "applied", "dismissed"
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+} 

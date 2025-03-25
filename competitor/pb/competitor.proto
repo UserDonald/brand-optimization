@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package competitor;
+
+option go_package = "github.com/donaldnash/go-competitor/competitor/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service CompetitorService {
+  // Competitor management
+  rpc AddCompetitor(AddCompetitorRequest) returns (Competitor) {}
+  rpc GetCompetitor(GetCompetitorRequest) returns (Competitor) {}
+  rpc ListCompetitors(ListCompetitorsRequest) returns (ListCompetitorsResponse) {}
+  rpc UpdateCompetitor(UpdateCompetitorRequest) returns (Competitor) {}
+  rpc DeleteCompetitor(DeleteCompetitorRequest) returns (google.protobuf.Empty) {}
+  
+  // Competitor metrics
+  rpc GetCompetitorMetrics(GetCompetitorMetricsRequest) returns (GetCompetitorMetricsResponse) {}
+  rpc CompareMetrics(CompareMetricsRequest) returns (CompareMetricsResponse) {}
+  rpc TrackCompetitorPost(TrackCompetitorPostRequest) returns (CompetitorMetric) {}
+}
+
+// Request and Response messages
+
+// Competitor management
+message AddCompetitorRequest {
+  string tenant_id = 1;
+  string name = 2;
+  string platform = 3;
+  string platform_id = 4;
+  map<string, string> metadata = 5;
+}
+
+message GetCompetitorRequest {
+  string tenant_id = 1;
+  string competitor_id = 2;
+}
+
+message ListCompetitorsRequest {
+  string tenant_id = 1;
+  string platform = 2; // Optional, filter by platform
+}
+
+message ListCompetitorsResponse {
+  repeated Competitor competitors = 1;
+}
+
+message UpdateCompetitorRequest {
+  string tenant_id = 1;
+  string competitor_id = 2;
+  string name = 3;
+  string platform = 4;
+  string platform_id = 5;
+  map<string, string> metadata = 6;
+}
+
+message DeleteCompetitorRequest {
+  string tenant_id = 1;
+  string competitor_id = 2;
+}
+
+// Competitor metrics
+message GetCompetitorMetricsRequest {
+  string tenant_id = 1;
+  string competitor_id = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+}
+
+message GetCompetitorMetricsResponse {
+  repeated CompetitorMetric metrics = 1;
+}
+
+message CompareMetricsRequest {
+  string tenant_id = 1;
+  string competitor_id = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+  LockedVariables locked_variables = 5;
+}
+
+message LockedVariables {
+  string day_of_week = 1; // Optional
+  string time_gap = 2; // Optional
+  string content_category = 3; // Optional
+  string content_format = 4; // Optional
+}
+
+message CompareMetricsResponse {
+  CompetitorComparison competitor = 1;
+  PersonalComparison personal = 2;
+  ComparisonRatios ratios = 3;
+}
+
+message CompetitorComparison {
+  repeated CompetitorMetric metrics = 1;
+  MetricAggregates aggregates = 2;
+}
+
+message PersonalComparison {
+  repeated PersonalMetric metrics = 1;
+  MetricAggregates aggregates = 2;
+}
+
+message MetricAggregates {
+  int32 total_likes = 1;
+  int32 total_shares = 2;
+  int32 total_comments = 3;
+  double avg_engagement_rate = 4;
+  double avg_watch_time = 5;
+}
+
+message ComparisonRatios {
+  double likes_ratio = 1;
+  double shares_ratio = 2;
+  double comments_ratio = 3;
+  double engagement_rate_ratio = 4;
+  double watch_time_ratio = 5;
+}
+
+message TrackCompetitorPostRequest {
+  string tenant_id = 1;
+  string competitor_id = 2;
+  string post_id = 3;
+  int32 likes = 4;
+  int32 shares = 5;
+  int32 comments = 6;
+  double click_through_rate = 7;
+  double avg_watch_time = 8;
+  google.protobuf.Timestamp posted_at = 9;
+  double engagement_rate = 10;
+}
+
+// Models
+message Competitor {
+  string id = 1;
+  string tenant_id = 2;
+  string name = 3;
+  string platform = 4;
+  string platform_id = 5;
+  map<string, string> metadata = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message CompetitorMetric {
+  string id = 1;
+  string competitor_id = 2;
+  string tenant_id = 3;
+  string post_id = 4;
+  int32 likes = 5;
+  int32 shares = 6;
+  int32 comments = 7;
+  double click_through_rate = 8;
+  double avg_watch_time = 9;
+  double engagement_rate = 10;
+  google.protobuf.Timestamp posted_at = 11;
+  google.protobuf.Timestamp created_at = 12;
+}
+
+message PersonalMetric {
+  string id = 1;
+  string tenant_id = 2;
+  string post_id = 3;
+  int32 likes = 4;
+  int32 shares = 5;
+  int32 comments = 6;
+  double click_through_rate = 7;
+  double avg_watch_time = 8;
+  double engagement_rate = 9;
+  google.protobuf.Timestamp posted_at = 10;
+  google.protobuf.Timestamp created_at = 11;
+} 

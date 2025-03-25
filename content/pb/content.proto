@@ -1,0 +1,216 @@
+syntax = "proto3";
+
+package content;
+
+option go_package = "github.com/donaldnash/go-competitor/content/pb";
+
+// ContentService provides APIs for managing content formats, performance, and scheduled posts
+service ContentService {
+  // Content format management
+  rpc GetContentFormats(GetContentFormatsRequest) returns (GetContentFormatsResponse);
+  rpc GetContentFormat(GetContentFormatRequest) returns (GetContentFormatResponse);
+  rpc CreateContentFormat(CreateContentFormatRequest) returns (CreateContentFormatResponse);
+  rpc UpdateContentFormat(UpdateContentFormatRequest) returns (UpdateContentFormatResponse);
+  rpc DeleteContentFormat(DeleteContentFormatRequest) returns (DeleteContentFormatResponse);
+
+  // Content format performance
+  rpc GetFormatPerformance(GetFormatPerformanceRequest) returns (GetFormatPerformanceResponse);
+  rpc UpdateFormatPerformance(UpdateFormatPerformanceRequest) returns (UpdateFormatPerformanceResponse);
+
+  // Scheduled posts
+  rpc GetScheduledPosts(GetScheduledPostsRequest) returns (GetScheduledPostsResponse);
+  rpc GetScheduledPost(GetScheduledPostRequest) returns (GetScheduledPostResponse);
+  rpc SchedulePost(SchedulePostRequest) returns (SchedulePostResponse);
+  rpc UpdateScheduledPost(UpdateScheduledPostRequest) returns (UpdateScheduledPostResponse);
+  rpc DeleteScheduledPost(DeleteScheduledPostRequest) returns (DeleteScheduledPostResponse);
+  rpc GetPostsDue(GetPostsDueRequest) returns (GetPostsDueResponse);
+}
+
+// Request for getting all content formats
+message GetContentFormatsRequest {
+  string tenant_id = 1;
+}
+
+// Response for getting all content formats
+message GetContentFormatsResponse {
+  repeated ContentFormat formats = 1;
+}
+
+// Request for getting a specific content format
+message GetContentFormatRequest {
+  string tenant_id = 1;
+  string format_id = 2;
+}
+
+// Response for getting a specific content format
+message GetContentFormatResponse {
+  ContentFormat format = 1;
+}
+
+// Request for creating a new content format
+message CreateContentFormatRequest {
+  string tenant_id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+// Response for creating a new content format
+message CreateContentFormatResponse {
+  ContentFormat format = 1;
+}
+
+// Request for updating an existing content format
+message UpdateContentFormatRequest {
+  string tenant_id = 1;
+  string format_id = 2;
+  string name = 3;
+  string description = 4;
+}
+
+// Response for updating an existing content format
+message UpdateContentFormatResponse {
+  ContentFormat format = 1;
+}
+
+// Request for deleting a content format
+message DeleteContentFormatRequest {
+  string tenant_id = 1;
+  string format_id = 2;
+}
+
+// Response for deleting a content format
+message DeleteContentFormatResponse {
+  bool success = 1;
+}
+
+// Request for getting performance metrics for a specific content format
+message GetFormatPerformanceRequest {
+  string tenant_id = 1;
+  string format_id = 2;
+  string start_date = 3; // RFC3339 format
+  string end_date = 4;   // RFC3339 format
+}
+
+// Response for getting performance metrics for a specific content format
+message GetFormatPerformanceResponse {
+  repeated FormatPerformance performance = 1;
+}
+
+// Request for updating performance metrics for a specific content format
+message UpdateFormatPerformanceRequest {
+  string tenant_id = 1;
+  string format_id = 2;
+  repeated FormatPerformance performance = 3;
+}
+
+// Response for updating performance metrics for a specific content format
+message UpdateFormatPerformanceResponse {
+  int32 updated_count = 1;
+}
+
+// Request for getting all scheduled posts
+message GetScheduledPostsRequest {
+  string tenant_id = 1;
+}
+
+// Response for getting all scheduled posts
+message GetScheduledPostsResponse {
+  repeated ScheduledPost posts = 1;
+}
+
+// Request for getting a specific scheduled post
+message GetScheduledPostRequest {
+  string tenant_id = 1;
+  string post_id = 2;
+}
+
+// Response for getting a specific scheduled post
+message GetScheduledPostResponse {
+  ScheduledPost post = 1;
+}
+
+// Request for scheduling a new post
+message SchedulePostRequest {
+  string tenant_id = 1;
+  string content = 2;
+  string platform = 3;
+  string format = 4;
+  string scheduled_time = 5; // RFC3339 format
+}
+
+// Response for scheduling a new post
+message SchedulePostResponse {
+  ScheduledPost post = 1;
+}
+
+// Request for updating an existing scheduled post
+message UpdateScheduledPostRequest {
+  string tenant_id = 1;
+  string post_id = 2;
+  string content = 3;
+  string platform = 4;
+  string format = 5;
+  string status = 6;
+  string scheduled_time = 7; // RFC3339 format
+}
+
+// Response for updating an existing scheduled post
+message UpdateScheduledPostResponse {
+  ScheduledPost post = 1;
+}
+
+// Request for deleting a scheduled post
+message DeleteScheduledPostRequest {
+  string tenant_id = 1;
+  string post_id = 2;
+}
+
+// Response for deleting a scheduled post
+message DeleteScheduledPostResponse {
+  bool success = 1;
+}
+
+// Request for getting all posts due for publishing
+message GetPostsDueRequest {
+  string tenant_id = 1;
+  string before = 2; // RFC3339 format
+}
+
+// Response for getting all posts due for publishing
+message GetPostsDueResponse {
+  repeated ScheduledPost posts = 1;
+}
+
+// ContentFormat represents a content format entity
+message ContentFormat {
+  string id = 1;
+  string tenant_id = 2;
+  string name = 3;
+  string description = 4;
+  string created_at = 5; // RFC3339 format
+  string updated_at = 6; // RFC3339 format
+}
+
+// FormatPerformance represents performance metrics for a content format
+message FormatPerformance {
+  string id = 1;
+  string format_id = 2;
+  double engagement_rate = 3;
+  double reach_rate = 4;
+  double conversion_rate = 5;
+  string audience_type = 6;
+  string measurement_date = 7; // RFC3339 format
+}
+
+// ScheduledPost represents a scheduled post entity
+message ScheduledPost {
+  string id = 1;
+  string tenant_id = 2;
+  string content = 3;
+  string scheduled_time = 4; // RFC3339 format
+  string platform = 5;
+  string format = 6;
+  string status = 7; // Pending, Published, Failed, Cancelled
+  string created_at = 8; // RFC3339 format
+  string updated_at = 9; // RFC3339 format
+} 

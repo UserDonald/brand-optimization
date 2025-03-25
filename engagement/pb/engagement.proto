@@ -1,0 +1,183 @@
+syntax = "proto3";
+
+package engagement;
+
+option go_package = "github.com/donaldnash/go-competitor/engagement/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service EngagementService {
+  // Personal metrics management
+  rpc TrackPost(TrackPostRequest) returns (PersonalMetric) {}
+  rpc GetPersonalMetrics(GetPersonalMetricsRequest) returns (GetPersonalMetricsResponse) {}
+  rpc UpdatePostMetrics(UpdatePostMetricsRequest) returns (PersonalMetric) {}
+  rpc DeletePostMetrics(DeletePostMetricsRequest) returns (google.protobuf.Empty) {}
+  
+  // Engagement analysis
+  rpc GetEngagementTrends(GetEngagementTrendsRequest) returns (GetEngagementTrendsResponse) {}
+  rpc GetTopPerformingPosts(GetTopPerformingPostsRequest) returns (GetTopPerformingPostsResponse) {}
+  rpc GetEngagementByDayTime(GetEngagementByDayTimeRequest) returns (GetEngagementByDayTimeResponse) {}
+  
+  // Content engagement
+  rpc GetEngagementByContentType(GetEngagementByContentTypeRequest) returns (GetEngagementByContentTypeResponse) {}
+  rpc GetEngagementByContentLength(GetEngagementByContentLengthRequest) returns (GetEngagementByContentLengthResponse) {}
+}
+
+// Personal metrics management messages
+message TrackPostRequest {
+  string tenant_id = 1;
+  string post_id = 2;
+  string platform = 3;
+  string content_type = 4;
+  string content_length = 5;
+  google.protobuf.Timestamp posted_at = 6;
+  map<string, string> metadata = 7;
+  int32 likes = 8;
+  int32 shares = 9;
+  int32 comments = 10;
+  double click_through_rate = 11;
+  double avg_watch_time = 12;
+  double engagement_rate = 13;
+}
+
+message GetPersonalMetricsRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  string platform = 4; // Optional filter
+  string content_type = 5; // Optional filter
+}
+
+message GetPersonalMetricsResponse {
+  repeated PersonalMetric metrics = 1;
+}
+
+message UpdatePostMetricsRequest {
+  string tenant_id = 1;
+  string post_id = 2;
+  int32 likes = 3;
+  int32 shares = 4;
+  int32 comments = 5;
+  double click_through_rate = 6;
+  double avg_watch_time = 7;
+  double engagement_rate = 8;
+}
+
+message DeletePostMetricsRequest {
+  string tenant_id = 1;
+  string post_id = 2;
+}
+
+// Engagement analysis messages
+message GetEngagementTrendsRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  string metric_type = 4; // "likes", "shares", "comments", "engagement_rate", etc.
+  string interval = 5; // "day", "week", "month"
+}
+
+message GetEngagementTrendsResponse {
+  repeated EngagementPoint points = 1;
+  TrendStatistics statistics = 2;
+}
+
+message EngagementPoint {
+  google.protobuf.Timestamp date = 1;
+  double value = 2;
+  int32 post_count = 3;
+}
+
+message TrendStatistics {
+  double average = 1;
+  double median = 2;
+  double min = 3;
+  double max = 4;
+  double growth_rate = 5; // positive = increasing, negative = decreasing
+}
+
+message GetTopPerformingPostsRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+  string metric = 4; // "likes", "shares", "comments", "engagement_rate", etc.
+  int32 limit = 5;
+}
+
+message GetTopPerformingPostsResponse {
+  repeated PersonalMetric posts = 1;
+}
+
+message GetEngagementByDayTimeRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message GetEngagementByDayTimeResponse {
+  repeated DayHourEngagement day_time_data = 1;
+}
+
+message DayHourEngagement {
+  string day_of_week = 1;
+  int32 hour = 2;
+  double engagement_rate = 3;
+  int32 post_count = 4;
+}
+
+// Content engagement messages
+message GetEngagementByContentTypeRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message GetEngagementByContentTypeResponse {
+  repeated ContentTypeEngagement content_types = 1;
+}
+
+message ContentTypeEngagement {
+  string content_type = 1;
+  double engagement_rate = 2;
+  int32 post_count = 3;
+  int32 total_likes = 4;
+  int32 total_shares = 5;
+  int32 total_comments = 6;
+}
+
+message GetEngagementByContentLengthRequest {
+  string tenant_id = 1;
+  google.protobuf.Timestamp start_date = 2;
+  google.protobuf.Timestamp end_date = 3;
+}
+
+message GetEngagementByContentLengthResponse {
+  repeated ContentLengthEngagement content_lengths = 1;
+}
+
+message ContentLengthEngagement {
+  string length_range = 1; // e.g. "0-30", "31-60", "61-120", "120+"
+  double engagement_rate = 2;
+  int32 post_count = 3;
+}
+
+// Models
+message PersonalMetric {
+  string id = 1;
+  string tenant_id = 2;
+  string post_id = 3;
+  string platform = 4;
+  string content_type = 5;
+  string content_length = 6;
+  int32 likes = 7;
+  int32 shares = 8;
+  int32 comments = 9;
+  double click_through_rate = 10;
+  double avg_watch_time = 11;
+  double engagement_rate = 12;
+  google.protobuf.Timestamp posted_at = 13;
+  map<string, string> metadata = 14;
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
+} 

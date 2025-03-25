@@ -1,0 +1,196 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+# Schema for the GraphQL API Gateway
+# This serves as the unified interface for all microservices
+
+# Root query type defines all available queries
+type Query {
+  # Health check
+  health: String!
+  
+  # Auth queries - these are ready for implementation
+  me: User
+  tenant: Tenant
+  
+  # Competitor queries - uncomment as implemented
+  # getCompetitors(tenantID: String!): [Competitor]
+  # getCompetitor(tenantID: String!, id: String!): Competitor
+  
+  # Audience queries - uncomment as implemented
+  # getAudienceSegments(tenantID: String!): [AudienceSegment]
+  # getAudienceSegment(tenantID: String!, id: String!): AudienceSegment
+  
+  # Content queries - uncomment as implemented
+  # getContentFormats(tenantID: String!): [ContentFormat]
+  # getContentFormat(tenantID: String!, id: String!): ContentFormat
+  # getScheduledPosts(tenantID: String!): [ScheduledPost]
+  # getScheduledPost(tenantID: String!, id: String!): ScheduledPost
+  
+  # Analytics queries - uncomment as implemented
+  # getRecommendedPostingTimes(tenantID: String!, dayOfWeek: String!): [RecommendedPostingTime]
+  # getRecommendedContentFormats(tenantID: String!): [RecommendedContentFormat]
+  # predictPostEngagement(tenantID: String!, contentFormat: String!, scheduledTime: String!): EngagementPrediction
+  # getContentPerformanceAnalysis(tenantID: String!, startDate: String!, endDate: String!): ContentPerformanceAnalysis
+}
+
+# Root mutation type defines all available mutations
+type Mutation {
+  # Simple ping for testing
+  ping: String!
+  
+  # Auth mutations - these are ready for implementation
+  login(email: String!, password: String!): AuthPayload
+  register(email: String!, password: String!, firstName: String!, lastName: String!, organizationName: String!): AuthPayload
+  refreshToken(refreshToken: String!): AuthPayload
+  logout: Boolean
+  
+  # Other domain mutations will be added as services are implemented
+}
+
+# Type definitions for currently implemented types
+# These match the models in the models package
+
+type User {
+  id: ID!
+  email: String!
+  firstName: String!
+  lastName: String!
+  tenantId: String!
+  role: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Tenant {
+  id: ID!
+  name: String!
+  plan: String!
+  active: Boolean!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  tokenType: String!
+  expiresIn: Int!
+  user: User!
+}
+
+# Remaining types - uncomment as implemented
+# type Competitor {
+#   id: ID!
+#   name: String!
+#   website: String
+#   socialProfiles: [SocialProfile]
+#   industry: String
+#   description: String
+#   strengths: [String]
+#   weaknesses: [String]
+#   tenantId: String!
+#   createdAt: String!
+#   updatedAt: String!
+# }
+
+# type SocialProfile {
+#   platform: String!
+#   handle: String!
+#   url: String!
+#   followers: Int
+#   engagement: Float
+# }
+
+# type AudienceSegment {
+#   id: ID!
+#   name: String!
+#   description: String
+#   demographics: Demographics
+#   interests: [String]
+#   behaviors: [String]
+#   size: Int
+#   tenantId: String!
+#   createdAt: String!
+#   updatedAt: String!
+# }
+
+# type Demographics {
+#   ageRange: String
+#   gender: String
+#   location: String
+#   income: String
+#   education: String
+# }
+
+# type ContentFormat {
+#   id: ID!
+#   name: String!
+#   description: String
+#   type: String!
+#   bestPractices: [String]
+#   exampleUrls: [String]
+#   tenantId: String!
+#   createdAt: String!
+#   updatedAt: String!
+# }
+
+# type ScheduledPost {
+#   id: ID!
+#   title: String!
+#   content: String!
+#   contentFormatId: String!
+#   contentFormat: ContentFormat
+#   scheduledTime: String!
+#   platforms: [String]!
+#   status: String!
+#   audienceSegmentId: String
+#   audienceSegment: AudienceSegment
+#   tenantId: String!
+#   createdAt: String!
+#   updatedAt: String!
+# }
+
+# type RecommendedPostingTime {
+#   dayOfWeek: String!
+#   hour: Int!
+#   expectedEngagement: Float!
+#   confidence: Float!
+# }
+
+# type RecommendedContentFormat {
+#   formatId: String!
+#   formatName: String!
+#   expectedEngagement: Float!
+#   confidence: Float!
+# }
+
+# type EngagementPrediction {
+#   likes: Int!
+#   comments: Int!
+#   shares: Int!
+#   clicks: Int!
+#   overallScore: Float!
+#   confidence: Float!
+# }
+
+# type ContentPerformanceAnalysis {
+#   topPerformingFormats: [PerformingFormat]
+#   engagementTrend: [EngagementPoint]
+#   audienceGrowth: Int
+#   totalReach: Int
+#   conversionRate: Float
+# }
+
+# type PerformingFormat {
+#   formatId: String!
+#   formatName: String!
+#   engagementScore: Float!
+# }
+
+# type EngagementPoint {
+#   date: String!
+#   value: Float!
+# } 

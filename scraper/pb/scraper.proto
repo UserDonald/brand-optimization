@@ -1,0 +1,201 @@
+syntax = "proto3";
+
+package scraper;
+
+option go_package = "github.com/donaldnash/go-competitor/scraper/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service ScraperService {
+  // Scraper management
+  rpc CreateScraperJob(CreateScraperJobRequest) returns (ScraperJob) {}
+  rpc GetScraperJob(GetScraperJobRequest) returns (ScraperJob) {}
+  rpc ListScraperJobs(ListScraperJobsRequest) returns (ListScraperJobsResponse) {}
+  rpc CancelScraperJob(CancelScraperJobRequest) returns (ScraperJob) {}
+  rpc DeleteScraperJob(DeleteScraperJobRequest) returns (google.protobuf.Empty) {}
+  
+  // Platform operations
+  rpc ListSupportedPlatforms(ListSupportedPlatformsRequest) returns (ListSupportedPlatformsResponse) {}
+  rpc GetPlatformStatus(GetPlatformStatusRequest) returns (PlatformStatus) {}
+  
+  // Scraper results
+  rpc GetScrapedData(GetScrapedDataRequest) returns (GetScrapedDataResponse) {}
+}
+
+// Request and Response messages
+
+// Scraper management
+message CreateScraperJobRequest {
+  string tenant_id = 1;
+  string platform = 2;
+  string target_id = 3;  // Platform-specific ID (e.g., username, profile ID)
+  ScraperJobType job_type = 4;
+  ScraperSchedule schedule = 5;
+  map<string, string> metadata = 6;
+}
+
+message GetScraperJobRequest {
+  string tenant_id = 1;
+  string job_id = 2;
+}
+
+message ListScraperJobsRequest {
+  string tenant_id = 1;
+  string platform = 2;  // Optional, filter by platform
+  ScraperJobType job_type = 3;  // Optional, filter by job type
+  ScraperJobStatus status = 4;  // Optional, filter by status
+}
+
+message ListScraperJobsResponse {
+  repeated ScraperJob jobs = 1;
+}
+
+message CancelScraperJobRequest {
+  string tenant_id = 1;
+  string job_id = 2;
+}
+
+message DeleteScraperJobRequest {
+  string tenant_id = 1;
+  string job_id = 2;
+}
+
+// Platform operations
+message ListSupportedPlatformsRequest {
+  string tenant_id = 1;
+}
+
+message ListSupportedPlatformsResponse {
+  repeated PlatformInfo platforms = 1;
+}
+
+message GetPlatformStatusRequest {
+  string tenant_id = 1;
+  string platform = 2;
+}
+
+// Scraper results
+message GetScrapedDataRequest {
+  string tenant_id = 1;
+  string job_id = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+}
+
+message GetScrapedDataResponse {
+  repeated ScrapedDataItem items = 1;
+}
+
+// Models
+message ScraperJob {
+  string id = 1;
+  string tenant_id = 2;
+  string platform = 3;
+  string target_id = 4;
+  ScraperJobType job_type = 5;
+  ScraperJobStatus status = 6;
+  ScraperSchedule schedule = 7;
+  string last_error = 8;
+  int32 run_count = 9;
+  google.protobuf.Timestamp last_run_at = 10;
+  google.protobuf.Timestamp next_run_at = 11;
+  map<string, string> metadata = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+message ScraperSchedule {
+  string cron_expression = 1;  // Cron expression for scheduled jobs
+  ScheduleFrequency frequency = 2;  // Predefined frequency
+  google.protobuf.Timestamp start_date = 3;  // Optional start date for scheduled jobs
+  google.protobuf.Timestamp end_date = 4;  // Optional end date for scheduled jobs
+}
+
+message PlatformInfo {
+  string name = 1;  // Platform name (e.g., "instagram", "twitter")
+  string display_name = 2;  // Display name (e.g., "Instagram", "Twitter")
+  string description = 3;  // Platform description
+  repeated ScraperJobType supported_job_types = 4;  // Supported job types
+  PlatformRateLimits rate_limits = 5;  // Rate limits
+}
+
+message PlatformStatus {
+  string platform = 1;
+  bool available = 2;
+  string status_message = 3;
+  PlatformRateLimits rate_limits = 4;
+  google.protobuf.Timestamp last_checked = 5;
+}
+
+message PlatformRateLimits {
+  int32 requests_per_minute = 1;
+  int32 requests_per_hour = 2;
+  int32 requests_per_day = 3;
+  int32 available_requests = 4;
+  google.protobuf.Timestamp reset_at = 5;
+}
+
+message ScrapedDataItem {
+  string id = 1;
+  string job_id = 2;
+  string tenant_id = 3;
+  string platform = 4;
+  string target_id = 5;
+  string post_id = 6;
+  ScraperDataType data_type = 7;
+  google.protobuf.Timestamp posted_at = 8;
+  
+  // Engagement metrics
+  int32 likes = 9;
+  int32 shares = 10;
+  int32 comments = 11;
+  double click_through_rate = 12;
+  double avg_watch_time = 13;
+  double engagement_rate = 14;
+  
+  // Content information
+  string content_type = 15;
+  string content_url = 16;
+  map<string, string> content_attributes = 17;
+  
+  google.protobuf.Timestamp scraped_at = 18;
+  google.protobuf.Timestamp created_at = 19;
+}
+
+// Enums
+enum ScraperJobType {
+  JOB_TYPE_UNSPECIFIED = 0;
+  JOB_TYPE_PROFILE = 1;  // Scrape profile information
+  JOB_TYPE_POSTS = 2;  // Scrape posts
+  JOB_TYPE_ENGAGEMENT = 3;  // Scrape engagement metrics
+  JOB_TYPE_COMMENTS = 4;  // Scrape comments
+  JOB_TYPE_FOLLOWERS = 5;  // Scrape followers information
+}
+
+enum ScraperJobStatus {
+  JOB_STATUS_UNSPECIFIED = 0;
+  JOB_STATUS_PENDING = 1;
+  JOB_STATUS_SCHEDULED = 2;
+  JOB_STATUS_RUNNING = 3;
+  JOB_STATUS_COMPLETED = 4;
+  JOB_STATUS_FAILED = 5;
+  JOB_STATUS_CANCELLED = 6;
+}
+
+enum ScheduleFrequency {
+  FREQUENCY_UNSPECIFIED = 0;
+  FREQUENCY_ONCE = 1;
+  FREQUENCY_HOURLY = 2;
+  FREQUENCY_DAILY = 3;
+  FREQUENCY_WEEKLY = 4;
+}
+
+enum ScraperDataType {
+  DATA_TYPE_UNSPECIFIED = 0;
+  DATA_TYPE_PROFILE = 1;
+  DATA_TYPE_POST = 2;
+  DATA_TYPE_STORY = 3;
+  DATA_TYPE_COMMENT = 4;
+  DATA_TYPE_FOLLOWER = 5;
+} 

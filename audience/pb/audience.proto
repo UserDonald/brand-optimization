@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package audience;
+
+option go_package = "github.com/donaldnash/go-competitor/audience/pb";
+
+// AudienceService provides APIs for managing audience segments and metrics
+service AudienceService {
+  // Segment management
+  rpc GetSegments(GetSegmentsRequest) returns (GetSegmentsResponse);
+  rpc GetSegment(GetSegmentRequest) returns (GetSegmentResponse);
+  rpc CreateSegment(CreateSegmentRequest) returns (CreateSegmentResponse);
+  rpc UpdateSegment(UpdateSegmentRequest) returns (UpdateSegmentResponse);
+  rpc DeleteSegment(DeleteSegmentRequest) returns (DeleteSegmentResponse);
+
+  // Segment metrics
+  rpc GetSegmentMetrics(GetSegmentMetricsRequest) returns (GetSegmentMetricsResponse);
+  rpc UpdateSegmentMetrics(UpdateSegmentMetricsRequest) returns (UpdateSegmentMetricsResponse);
+}
+
+// Request for getting all audience segments
+message GetSegmentsRequest {
+  string tenant_id = 1;
+}
+
+// Response for getting all audience segments
+message GetSegmentsResponse {
+  repeated AudienceSegment segments = 1;
+}
+
+// Request for getting a specific audience segment
+message GetSegmentRequest {
+  string tenant_id = 1;
+  string segment_id = 2;
+}
+
+// Response for getting a specific audience segment
+message GetSegmentResponse {
+  AudienceSegment segment = 1;
+}
+
+// Request for creating a new audience segment
+message CreateSegmentRequest {
+  string tenant_id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+}
+
+// Response for creating a new audience segment
+message CreateSegmentResponse {
+  AudienceSegment segment = 1;
+}
+
+// Request for updating an existing audience segment
+message UpdateSegmentRequest {
+  string tenant_id = 1;
+  string segment_id = 2;
+  string name = 3;
+  string description = 4;
+  string type = 5;
+}
+
+// Response for updating an existing audience segment
+message UpdateSegmentResponse {
+  AudienceSegment segment = 1;
+}
+
+// Request for deleting an audience segment
+message DeleteSegmentRequest {
+  string tenant_id = 1;
+  string segment_id = 2;
+}
+
+// Response for deleting an audience segment
+message DeleteSegmentResponse {
+  bool success = 1;
+}
+
+// Request for getting metrics for a specific audience segment
+message GetSegmentMetricsRequest {
+  string tenant_id = 1;
+  string segment_id = 2;
+  string start_date = 3; // RFC3339 format
+  string end_date = 4;   // RFC3339 format
+}
+
+// Response for getting metrics for a specific audience segment
+message GetSegmentMetricsResponse {
+  repeated SegmentMetric metrics = 1;
+}
+
+// Request for updating metrics for a specific audience segment
+message UpdateSegmentMetricsRequest {
+  string tenant_id = 1;
+  string segment_id = 2;
+  repeated SegmentMetric metrics = 3;
+}
+
+// Response for updating metrics for a specific audience segment
+message UpdateSegmentMetricsResponse {
+  int32 updated_count = 1;
+}
+
+// AudienceSegment represents an audience segment entity
+message AudienceSegment {
+  string id = 1;
+  string tenant_id = 2;
+  string name = 3;
+  string description = 4;
+  string type = 5;
+  string created_at = 6; // RFC3339 format
+  string updated_at = 7; // RFC3339 format
+}
+
+// SegmentMetric represents engagement metrics for an audience segment
+message SegmentMetric {
+  string id = 1;
+  string segment_id = 2;
+  int32 size = 3;
+  double engagement_rate = 4;
+  string content_preference = 5;
+  double response_time = 6;
+  double conversion_rate = 7;
+  string topical_interest = 8;
+  string device_type = 9;
+  string engagement_freq = 10;
+  string sentiment_tendency = 11;
+  string measurement_date = 12; // RFC3339 format
+} 

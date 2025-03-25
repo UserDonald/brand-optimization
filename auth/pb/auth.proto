@@ -1,0 +1,205 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = ".;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service AuthService {
+  // Authentication
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty) {}
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
+  
+  // User management
+  rpc CreateUser(CreateUserRequest) returns (User) {}
+  rpc GetUser(GetUserRequest) returns (User) {}
+  rpc UpdateUser(UpdateUserRequest) returns (User) {}
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
+  
+  // Tenant management
+  rpc CreateTenant(CreateTenantRequest) returns (Tenant) {}
+  rpc CreateOrganization(CreateOrganizationRequest) returns (Tenant) {}
+  rpc GetTenant(GetTenantRequest) returns (Tenant) {}
+  rpc ListTenants(ListTenantsRequest) returns (ListTenantsResponse) {}
+  rpc UpdateTenant(UpdateTenantRequest) returns (Tenant) {}
+  rpc DeleteTenant(DeleteTenantRequest) returns (google.protobuf.Empty) {}
+  
+  // Authorization
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
+  rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
+  rpc GetUserPermissions(GetUserPermissionsRequest) returns (GetUserPermissionsResponse) {}
+}
+
+// Authentication messages
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  string token_type = 3;
+  int32 expires_in = 4;
+  User user = 5;
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string organization_name = 5;
+}
+
+message RegisterResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  string token_type = 3;
+  int32 expires_in = 4;
+  User user = 5;
+  Tenant tenant = 6;
+}
+
+message LogoutRequest {
+  string access_token = 1;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  string token_type = 3;
+  int32 expires_in = 4;
+}
+
+// User management messages
+message CreateUserRequest {
+  string tenant_id = 1;
+  string email = 2;
+  string password = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string role = 6;
+  map<string, string> metadata = 7;
+}
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message UpdateUserRequest {
+  string user_id = 1;
+  string email = 2;
+  string first_name = 3;
+  string last_name = 4;
+  string role = 5;
+  map<string, string> metadata = 6;
+  bool active = 7;
+}
+
+message DeleteUserRequest {
+  string user_id = 1;
+}
+
+// Tenant management messages
+message CreateTenantRequest {
+  string name = 1;
+  string plan = 2;
+  map<string, string> metadata = 3;
+}
+
+message CreateOrganizationRequest {
+  string name = 1;
+  string account_owner_id = 2;
+  string plan = 3;
+}
+
+message GetTenantRequest {
+  string tenant_id = 1;
+}
+
+message ListTenantsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message ListTenantsResponse {
+  repeated Tenant tenants = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message UpdateTenantRequest {
+  string tenant_id = 1;
+  string name = 2;
+  string plan = 3;
+  map<string, string> metadata = 4;
+  bool active = 5;
+}
+
+message DeleteTenantRequest {
+  string tenant_id = 1;
+}
+
+// Authorization messages
+message ValidateTokenRequest {
+  string access_token = 1;
+}
+
+message ValidateTokenResponse {
+  bool valid = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string role = 4;
+}
+
+message HasPermissionRequest {
+  string user_id = 1;
+  string permission = 2;
+  string resource_id = 3;
+}
+
+message HasPermissionResponse {
+  bool has_permission = 1;
+}
+
+message GetUserPermissionsRequest {
+  string user_id = 1;
+}
+
+message GetUserPermissionsResponse {
+  repeated string permissions = 1;
+}
+
+// Models
+message User {
+  string id = 1;
+  string tenant_id = 2;
+  string email = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string role = 6;
+  map<string, string> metadata = 7;
+  bool active = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+}
+
+message Tenant {
+  string id = 1;
+  string name = 2;
+  string plan = 3;
+  map<string, string> metadata = 4;
+  bool active = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+} 
